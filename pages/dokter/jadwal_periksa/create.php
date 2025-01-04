@@ -20,40 +20,41 @@ if ($akses != 'dokter') {
 
 // Input data to db
 if (isset($_POST["submit"])) {
-  // Cek validasi
-  if (empty($_POST["hari"]) || empty($_POST["jam_mulai"]) || empty($_POST["jam_selesai"])) {
-      echo "
-          <script>
-              alert('Data tidak boleh kosong');
-              document.location.href = '../jadwal_periksa/create.php';
-          </script>
-      ";
-      die;
-  } else {  
-    // cek apakah data berhasil di tambahkan atau tidak
-    if (tambahJadwalPeriksa($_POST) > 0) {
+    // Cek validasi
+    if (empty($_POST["hari"]) || empty($_POST["jam_mulai"]) || empty($_POST["jam_selesai"])) {
         echo "
             <script>
-                alert('Data berhasil ditambahkan');
-                document.location.href = '../jadwal_periksa';
+                alert('Data tidak boleh kosong');
+                document.location.href = 'create.php';
             </script>
         ";
-    } else if (tambahJadwalPeriksa($_POST) == -2) {
-        echo "
-            <script>
-                alert('Data Gagal ditambahkan, jadwal periksa sudah ada');
-                document.location.href = '../jadwal_periksa/create.php';
-            </script>
-        ";
-    } else if (tambahJadwalPeriksa($_POST) == -1) {
-        echo "
-            <script>
-                alert('Data Gagal ditambahkan');
-                document.location.href = '../jadwal_periksa';
-            </script>
-        ";
+        die;
+    } else {
+        // cek apakah data berhasil di tambahkan atau tidak
+        $result = tambahJadwalPeriksa($_POST);
+        if ($result > 0) {
+            echo "
+                <script>
+                    alert('Data berhasil ditambahkan');
+                    document.location.href = '../jadwal_periksa';
+                </script>
+            ";
+        } else if ($result == -3) {
+            echo "
+                <script>
+                    alert('Anda sudah memiliki jadwal di hari tersebut!');
+                    document.location.href = 'create.php';
+                </script>
+            ";
+        } else {
+            echo "
+                <script>
+                    alert('Data gagal ditambahkan');
+                    document.location.href = 'create.php';
+                </script>
+            ";
+        }
     }
-  }
 }
 ?>
 

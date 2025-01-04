@@ -57,29 +57,26 @@ function tambahJadwalPeriksa($data)
         $jam_selesai = mysqli_real_escape_string($conn, $data["jam_selesai"]);
         $aktif = 'T';
 
-        // Check if the jadwal periksa already exists for another dokter
-        // Check as well if the time range is already taken by another dokter
-        $existing_data = mysqli_query($conn, "SELECT * FROM jadwal_periksa WHERE id_dokter != $id_dokter AND hari = '$hari'");
-        if (mysqli_num_rows($existing_data) > 0) {
-            while ($row = mysqli_fetch_assoc($existing_data)) {
-                $query_existing = "SELECT * FROM jadwal_periksa WHERE id_dokter != $id_dokter AND hari = '$hari' AND jam_mulai <= '$jam_mulai' AND jam_selesai >= '$jam_mulai' OR jam_mulai <= '$jam_selesai' AND jam_selesai >= '$jam_selesai' OR jam_mulai >= '$jam_mulai' AND jam_selesai <= '$jam_selesai'";
-                $checkJadwalPeriksa = mysqli_query($conn, $query_existing);
-            }
-            if (mysqli_num_rows($checkJadwalPeriksa) > 0) {
-                return -2; // Return -2 if the jadwal periksa already exists
-            }
+        // Cek apakah dokter sudah memiliki jadwal di hari yang sama
+        $check_query = "SELECT * FROM jadwal_periksa WHERE id_dokter = '$id_dokter' AND hari = '$hari'";
+        $result = mysqli_query($conn, $check_query);
+
+        if (mysqli_num_rows($result) > 0) {
+            return -3; // Return -3 jika dokter sudah memiliki jadwal di hari tersebut
         }
 
+        // Jika belum ada jadwal di hari yang sama, tambahkan jadwal baru
         $query = "INSERT INTO jadwal_periksa VALUES (null, '$id_dokter', '$hari', '$jam_mulai', '$jam_selesai', '$aktif')";
+        
         if (mysqli_query($conn, $query)) {
-            return mysqli_affected_rows($conn); // Return the number of affected rows
+            return mysqli_affected_rows($conn);
         } else {
-            // Handle the error
             echo "Error updating record: " . mysqli_error($conn);
-            return -1; // Or any other error indicator
+            return -1;
         }
     } catch (\Exception $e) {
         var_dump($e->getMessage());
+        return -1;
     }
 }
 
