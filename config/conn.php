@@ -93,13 +93,13 @@ function updateJadwalPeriksa($data, $id)
         $jam_selesai = mysqli_real_escape_string($conn, $data["jam_selesai"]);
         $aktif = mysqli_real_escape_string($conn, $data["aktif"]);
 
-        if ($aktif == 'Y') {
-            // Make jadwal apapun yang sudah aktif menjadi tidak aktif
-            $query = "UPDATE jadwal_periksa SET aktif = 'T' WHERE aktif = 'Y'";
-            mysqli_query($conn, $query);
-        }
-
-        $query = "UPDATE jadwal_periksa SET hari = '$hari', jam_mulai = '$jam_mulai', jam_selesai = '$jam_selesai', aktif = '$aktif' WHERE id = $id ";
+        // Update jadwal tanpa mengubah status jadwal lain
+        $query = "UPDATE jadwal_periksa SET 
+                    hari = '$hari',
+                    jam_mulai = '$jam_mulai', 
+                    jam_selesai = '$jam_selesai',
+                    aktif = '$aktif'
+                 WHERE id = $id";
 
         if (mysqli_query($conn, $query)) {
             return mysqli_affected_rows($conn); // Return the number of affected rows

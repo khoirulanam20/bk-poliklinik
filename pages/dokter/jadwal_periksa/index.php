@@ -6,12 +6,14 @@ session_start();
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['id']) && isset($_POST['status'])) {
   $id = $_POST['id'];
   $status = $_POST['status'];
-
-  // Ubah status pada jadwal yang lain menjadi 'T' jika status baru adalah 'Y'
+  $id_dokter = $_SESSION['id']; // Ambil id dokter yang sedang login
+  
+  // Jika mengaktifkan jadwal, hanya nonaktifkan jadwal lain dari dokter yang sama
   if ($status == 'Y') {
-    $pdo->prepare("UPDATE jadwal_periksa SET aktif = 'T' WHERE aktif = 'Y'")->execute();
+    $stmt = $pdo->prepare("UPDATE jadwal_periksa SET aktif = 'T' WHERE id_dokter = ? AND id != ?");
+    $stmt->execute([$id_dokter, $id]);
   }
-
+  
   // Update status jadwal yang dipilih
   $stmt = $pdo->prepare("UPDATE jadwal_periksa SET aktif = ? WHERE id = ?");
   $stmt->execute([$status, $id]);
