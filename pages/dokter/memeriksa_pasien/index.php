@@ -17,6 +17,9 @@ if ($akses != 'dokter') {
   die();
 }
 
+$dokter = query("SELECT * FROM dokter WHERE nama = '$nama'")[0];
+$id_dokter = $dokter['id'];
+
 $pasien = query("SELECT
                   periksa.id AS id_periksa,
                   pasien.id AS id_pasien,
@@ -27,7 +30,9 @@ $pasien = query("SELECT
                   daftar_poli.status_periksa AS status_periksa
                 FROM pasien 
                 INNER JOIN daftar_poli ON pasien.id = daftar_poli.id_pasien
-                LEFT JOIN periksa ON daftar_poli.id = periksa.id_daftar_poli");
+                INNER JOIN jadwal_periksa ON daftar_poli.id_jadwal = jadwal_periksa.id
+                LEFT JOIN periksa ON daftar_poli.id = periksa.id_daftar_poli
+                WHERE jadwal_periksa.id_dokter = '$id_dokter'");
 
 $periksa = query("SELECT * from periksa");
 
